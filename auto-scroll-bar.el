@@ -52,30 +52,35 @@
 
 (defun auto-scroll-bar--should-show-vertical-p ()
   "Return non-nil if we should show the vertical scroll-bar."
-  (not (string= (format-mode-line "%p") "All")))
+  (and scroll-bar-mode
+       (not (string= (format-mode-line mode-line-percent-position) "All"))))
 
 (defun auto-scroll-bar--should-show-horizontal-p ()
   "Return non-nil if we should show the horizontal scroll-bar."
-  (not (string= (format-mode-line "%p") "All")))
+  (and horizontal-scroll-bar-mode))
 
-(defun auto-scroll-bar--window-state-change (&optional win &rest _)
-  ""
-  (setq win (or win (selected-window)))
-  (if (member (buffer-name (window-buffer win)) auto-scroll-bar-disabled-buffers)
-      (set-window-scroll-bars win nil nil nil nil t)
-    (let ((show-v (auto-scroll-bar--should-show-vertical-p))
-          (show-h (auto-scroll-bar--should-show-horizontal-p)))
-      (set-window-scroll-bars win nil show-v nil show-h t))))
+(defun auto-scroll-bar--show-hide (win)
+  "Show/Hide scroll-bar for WINDOW."
+  (with-selected-window win
+    (if (member (buffer-name) auto-scroll-bar-disabled-buffers)
+        (set-window-scroll-bars win nil nil nil nil t)
+      (let ((show-v (auto-scroll-bar--should-show-vertical-p))
+            (show-h (auto-scroll-bar--should-show-horizontal-p)))
+        (set-window-scroll-bars win nil show-v nil show-h t)))))
+
+(defun auto-scroll-bar--window-state-change (&rest _)
+  "Window state change."
+  (dolist (win (window-list)) (auto-scroll-bar--show-hide win)))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
   (add-hook 'window-state-change-hook #'auto-scroll-bar--window-state-change)
-  (add-hook 'window-scroll-functions #'auto-scroll-bar--window-state-change))
+  (when auto-scroll-bar-hide-minibuffer
+    (set-window-scroll-bars (minibuffer-window) nil nil nil nil t)))
 
 (defun auto-scroll-bar--disable ()
   "Disable function `auto-scroll-bar-mode'."
-  (remove-hook 'window-state-change-hook #'auto-scroll-bar--window-state-change)
-  (remove-hook 'window-scroll-functions #'auto-scroll-bar--window-state-change))
+  (remove-hook 'window-state-change-hook #'auto-scroll-bar--window-state-change))
 
 ;;;###autoload
 (define-minor-mode auto-scroll-bar-mode
