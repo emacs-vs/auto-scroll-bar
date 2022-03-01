@@ -5,7 +5,7 @@
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; Description: Automatically show/hide scroll-bar.
-;; Keyword:
+;; Keyword: scrollbar
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "24.3"))
 ;; URL: https://github.com/jcs-elpa/auto-scroll-bar
@@ -50,37 +50,46 @@
   :type 'boolean
   :group 'auto-scroll-bar)
 
-(defun auto-scroll-bar--should-show-vertical-p ()
+(defun auto-scroll-bar--show-v-p ()
   "Return non-nil if we should show the vertical scroll-bar."
   (and scroll-bar-mode
        (not (string= (format-mode-line mode-line-percent-position) "All"))))
 
-(defun auto-scroll-bar--should-show-horizontal-p ()
+(defun auto-scroll-bar--show-h-p ()
   "Return non-nil if we should show the horizontal scroll-bar."
   (and horizontal-scroll-bar-mode))
 
+(defun auto-scroll-bar--update (win show-v show-h)
+  "Update scrollbar WIN, SHOW-V, SHOW-H."
+  (let* ((bars (window-scroll-bars win))
+         (shown-v (nth 2 bars))
+         (shown-h (nth 5 bars)))
+    (when (or (not (eq shown-v show-v)) (not (eq shown-h show-h)))
+      (set-window-scroll-bars win nil show-v nil show-h t))))
+
 (defun auto-scroll-bar--show-hide (win)
-  "Show/Hide scroll-bar for WINDOW."
+  "Show/Hide scroll-bar for WIN."
   (with-selected-window win
     (if (member (buffer-name) auto-scroll-bar-disabled-buffers)
-        (set-window-scroll-bars win nil nil nil nil t)
-      (let ((show-v (auto-scroll-bar--should-show-vertical-p))
-            (show-h (auto-scroll-bar--should-show-horizontal-p)))
-        (set-window-scroll-bars win nil show-v nil show-h t)))))
+        (auto-scroll-bar--update win nil nil)
+      (let ((show-v (auto-scroll-bar--show-v-p))
+            (show-h (auto-scroll-bar--show-h-p)))
+        (auto-scroll-bar--update win show-v show-h)))))
 
-(defun auto-scroll-bar--window-state-change (&rest _)
+(defun auto-scroll-bar--change (&rest _)
   "Window state change."
-  (dolist (win (window-list)) (auto-scroll-bar--show-hide win)))
+  (dolist (win (window-list))
+    (auto-scroll-bar--show-hide win)))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
-  (add-hook 'window-state-change-hook #'auto-scroll-bar--window-state-change)
+  (add-hook 'post-command-hook #'auto-scroll-bar--change)
   (when auto-scroll-bar-hide-minibuffer
-    (set-window-scroll-bars (minibuffer-window) nil nil nil nil t)))
+    (auto-scroll-bar--update (minibuffer-window) nil nil)))
 
 (defun auto-scroll-bar--disable ()
   "Disable function `auto-scroll-bar-mode'."
-  (remove-hook 'window-state-change-hook #'auto-scroll-bar--window-state-change))
+  (remove-hook 'post-command-hook #'auto-scroll-bar--change))
 
 ;;;###autoload
 (define-minor-mode auto-scroll-bar-mode
