@@ -52,6 +52,11 @@
   :type 'boolean
   :group 'auto-scroll-bar)
 
+(defcustom auto-scroll-bar-horizontal t
+  "Set to non-nil to auto show/hide horizontal-scroll-bar."
+  :type 'boolean
+  :group 'auto-scroll-bar)
+
 ;;
 ;; (@* "Util" )
 ;;
@@ -79,25 +84,34 @@
       (cl-decf width (scroll-bar-columns (get-scroll-bar-mode))))
     width))
 
+(defun auto-scroll-bar--window-height ()
+  "Calculate inner window height."
+  (let ((height (window-height)))
+    (when horizontal-scroll-bar
+      (cl-decf height (scroll-bar-lines)))
+    height))
+
 ;;
 ;; (@* "Core" )
 ;;
 
 (defun auto-scroll-bar--show-v-p ()
   "Return non-nil if we should show the vertical scroll-bar."
-  (not (string= (format-mode-line mode-line-percent-position) "All")))
+  (and vertical-scroll-bar
+       (not (string= (format-mode-line mode-line-percent-position) "All"))))
 
 (defun auto-scroll-bar--show-h-p ()
   "Return non-nil if we should show the horizontal scroll-bar."
-  (save-excursion
-    (move-to-window-line 0)
-    (let ((count 0) (target (window-height)) break)
-      (while (and (not (eobp)) (< count target) (not break))
-        (if (< (auto-scroll-bar--window-width) (- (line-end-position) (line-beginning-position)))
-            (setq break t)
-          (forward-line 1)
-          (cl-incf count)))
-      break)))
+  (when horizontal-scroll-bar
+    (save-excursion
+      (move-to-window-line 0)
+      (let ((count 0) (target (auto-scroll-bar--window-height)) break)
+        (while (and (not (eobp)) (< count target) (not break))
+          (if (< (auto-scroll-bar--window-width) (- (line-end-position) (line-beginning-position)))
+              (setq break t)
+            (forward-line 1)
+            (cl-incf count)))
+        break))))
 
 (defun auto-scroll-bar--update (win show-v show-h &optional persistent)
   "Update scrollbar WIN, SHOW-V, SHOW-H, PERSISTENT."
@@ -116,19 +130,21 @@
 (defun auto-scroll-bar--change (&rest _)
   "Window state change."
   (auto-scroll-bar--with-no-redisplay
-   (dolist (win (window-list)) (auto-scroll-bar--show-hide win))))
+    (dolist (win (window-list)) (auto-scroll-bar--show-hide win))))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
   (add-hook 'post-command-hook #'auto-scroll-bar--change)  ; post command, less buggy
   (toggle-scroll-bar 1)
-  (toggle-horizontal-scroll-bar 1)
+  (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
   (when auto-scroll-bar-hide-minibuffer
     (auto-scroll-bar--update (minibuffer-window) nil nil t)))
 
 (defun auto-scroll-bar--disable ()
   "Disable function `auto-scroll-bar-mode'."
-  (remove-hook 'post-command-hook #'auto-scroll-bar--change))
+  (remove-hook 'post-command-hook #'auto-scroll-bar--change)
+  (toggle-scroll-bar -1)
+  (toggle-horizontal-scroll-bar -1))
 
 ;;;###autoload
 (define-minor-mode auto-scroll-bar-mode
