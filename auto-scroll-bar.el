@@ -42,8 +42,14 @@
   :link '(url-link :tag "Repository" "https://github.com/jcs-elpa/auto-scroll-bar"))
 
 (defcustom auto-scroll-bar-disabled-buffers
-  '("*dashboard*")
+  '()
   "List of buffers to disable the scroll bar completely."
+  :type 'list
+  :group 'auto-scroll-bar)
+
+(defcustom auto-scroll-bar-disabled-major-modes
+  '()
+  "List of major-mode to disable the scroll bar completely."
   :type 'list
   :group 'auto-scroll-bar)
 
@@ -113,6 +119,11 @@
             (cl-incf count)))
         break))))
 
+(defun auto-scroll-bar--disabled-p ()
+  "Return non-nil if scroll-bars should be ignored."
+  (or (member (buffer-name) auto-scroll-bar-disabled-buffers)
+      (member major-mode auto-scroll-bar-disabled-major-modes)))
+
 (defun auto-scroll-bar--toggle-p (win show-v show-h)
   "Return non-nil if we should call function `set-window-scroll-bars'.
 
@@ -132,7 +143,7 @@ and SHOW-H."
 (defun auto-scroll-bar--show-hide (win)
   "Show/Hide scroll-bar for WIN."
   (with-selected-window win
-    (if (member (buffer-name) auto-scroll-bar-disabled-buffers)
+    (if (auto-scroll-bar--disabled-p)
         (auto-scroll-bar--update win nil nil)
       (let ((show-v (auto-scroll-bar--show-v-p))
             (show-h (auto-scroll-bar--show-h-p)))
