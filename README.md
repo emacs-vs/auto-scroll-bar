@@ -6,7 +6,13 @@
 
 [![CI](https://github.com/jcs-elpa/auto-scroll-bar/actions/workflows/test.yml/badge.svg)](https://github.com/jcs-elpa/auto-scroll-bar/actions/workflows/test.yml)
 
-##  Usage
+## 🔨 Usage
+
+Put this in your config,
+
+```el
+(auto-scroll-bar-mode 1)
+```
 
 ## Contribute
 
