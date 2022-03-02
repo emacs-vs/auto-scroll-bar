@@ -2,7 +2,7 @@
 [![JCS-ELPA](https://raw.githubusercontent.com/jcs-emacs/jcs-elpa/master/badges/v/auto-scroll-bar.svg)](https://jcs-emacs.github.io/jcs-elpa/#/auto-scroll-bar)
 
 # auto-scroll-bar
-> Automatically show/hide scroll-bar
+> Automatically show/hide scroll-bars as needed
 
 [![CI](https://github.com/jcs-elpa/auto-scroll-bar/actions/workflows/test.yml/badge.svg)](https://github.com/jcs-elpa/auto-scroll-bar/actions/workflows/test.yml)
 

@@ -32,6 +32,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'scroll-bar)
 
 (defgroup auto-scroll-bar nil
