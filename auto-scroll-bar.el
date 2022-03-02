@@ -53,7 +53,7 @@
   :group 'auto-scroll-bar)
 
 (defcustom auto-scroll-bar-horizontal t
-  "Set to non-nil to auto show/hide horizontal-scroll-bar."
+  "Set to non-nil to auto show/hide horizontal scroll-bar."
   :type 'boolean
   :group 'auto-scroll-bar)
 
@@ -113,14 +113,20 @@
             (cl-incf count)))
         break))))
 
-(defun auto-scroll-bar--update (win show-v show-h &optional persistent)
-  "Update scrollbar WIN, SHOW-V, SHOW-H, PERSISTENT."
-  ;;(set-window-scroll-bars win nil show-v nil show-h persistent)
+(defun auto-scroll-bar--toggle-p (win show-v show-h)
+  "Return non-nil if we should call function `set-window-scroll-bars'.
+
+See function `auto-scroll-bar--update' description for arguments WIN, SHOW-V,
+and SHOW-H."
   (let* ((bars (window-scroll-bars win))
          (shown-v (nth 2 bars))
          (shown-h (nth 5 bars)))
-    (when (or (not (eq shown-v show-v)) (not (eq shown-h show-h)))
-      (set-window-scroll-bars win nil show-v nil show-h persistent)))
+    (or (not (eq shown-v show-v)) (not (eq shown-h show-h)))))
+
+(defun auto-scroll-bar--update (win show-v show-h &optional persistent)
+  "Update scrollbar WIN, SHOW-V, SHOW-H, PERSISTENT."
+  (when (auto-scroll-bar--toggle-p win show-v show-h)
+    (set-window-scroll-bars win nil show-v nil show-h persistent))
   (save-window-excursion (ignore-errors (enlarge-window 1))))  ; refresh
 
 (defun auto-scroll-bar--show-hide (win)
