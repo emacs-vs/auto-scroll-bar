@@ -10,7 +10,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 * Use window start/end instead of mode-line format to calculate buffer percentage (30286ef015183d1229de605a7b30062813ed0794)
 
-## 0.1.0 (Unreleased)
+## 0.1.0
 > Released Mar 02, 2022
 
 * Initial release
