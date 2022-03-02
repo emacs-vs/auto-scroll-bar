@@ -57,6 +57,14 @@
   :type 'boolean
   :group 'auto-scroll-bar)
 
+(defcustom auto-scroll-bar-delay 0.2
+  "Time to update scroll-bars state."
+  :type 'float
+  :group 'auto-scroll-bar)
+
+(defvar auto-scroll-bar--timer nil
+  "Timer to do the show/hide task.")
+
 ;;
 ;; (@* "Util" )
 ;;
@@ -127,10 +135,16 @@
             (show-h (auto-scroll-bar--show-h-p)))
         (auto-scroll-bar--update win show-v show-h)))))
 
-(defun auto-scroll-bar--change (&rest _)
-  "Window state change."
+(defun auto-scroll-bar--start-task ()
+  ""
   (auto-scroll-bar--with-no-redisplay
     (dolist (win (window-list)) (auto-scroll-bar--show-hide win))))
+
+(defun auto-scroll-bar--change (&rest _)
+  "Window state change."
+  (when (timerp auto-scroll-bar--timer) (cancel-timer auto-scroll-bar--timer))
+  (setq auto-scroll-bar--timer
+        (run-with-idle-timer auto-scroll-bar-delay nil #'auto-scroll-bar--start-task)))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
