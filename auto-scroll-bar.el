@@ -149,7 +149,8 @@ and SHOW-H."
   (toggle-scroll-bar 1)
   (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
   (when auto-scroll-bar-hide-minibuffer
-    (auto-scroll-bar--update (minibuffer-window) nil nil t)))
+    (auto-scroll-bar--update (minibuffer-window) nil nil t))
+  (auto-scroll-bar--change))  ; execute once
 
 (defun auto-scroll-bar--disable ()
   "Disable function `auto-scroll-bar-mode'."
