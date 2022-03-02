@@ -40,7 +40,8 @@
   :group 'tool
   :link '(url-link :tag "Repository" "https://github.com/jcs-elpa/auto-scroll-bar"))
 
-(defcustom auto-scroll-bar-disabled-buffers '()
+(defcustom auto-scroll-bar-disabled-buffers
+  '("*dashboard*")
   "List of buffers to disable the scroll bar completely."
   :type 'list
   :group 'auto-scroll-bar)
@@ -50,22 +51,57 @@
   :type 'boolean
   :group 'auto-scroll-bar)
 
+;;
+;; (@* "Util" )
+;;
+
+(defmacro auto-scroll-bar--with-no-redisplay (&rest body)
+  "Execute BODY without any redisplay execution."
+  (declare (indent 0) (debug t))
+  `(let ((inhibit-redisplay t)
+         (inhibit-modification-hooks t)
+         (inhibit-point-motion-hooks t)
+         after-focus-change-function
+         buffer-list-update-hook
+         display-buffer-alist
+         window-configuration-change-hook
+         window-size-change-functions
+         window-state-change-hook)
+     ,@body))
+
+(defun auto-scroll-bar--window-width ()
+  "Calculate inner window width."
+  (let ((width (window-width)))
+    (when (bound-and-true-p display-line-numbers-mode)
+      (cl-decf width (line-number-display-width)))
+    (when vertical-scroll-bar
+      (cl-decf width (scroll-bar-columns (get-scroll-bar-mode))))
+    width))
+
+;;
+;; (@* "Core" )
+;;
+
 (defun auto-scroll-bar--show-v-p ()
   "Return non-nil if we should show the vertical scroll-bar."
-  (and scroll-bar-mode
-       (not (string= (format-mode-line mode-line-percent-position) "All"))))
+  (not (string= (format-mode-line mode-line-percent-position) "All")))
 
 (defun auto-scroll-bar--show-h-p ()
   "Return non-nil if we should show the horizontal scroll-bar."
-  (and horizontal-scroll-bar-mode))
+  (save-excursion
+    (move-to-window-line 0)
+    (let ((count 0) (target (window-height)) break)
+      (while (and (not (eobp)) (< count target) (not break))
+        (if (< (auto-scroll-bar--window-width) (- (line-end-position) (line-beginning-position)))
+            (setq break t)
+          (forward-line 1)
+          (cl-incf count)))
+      break)))
 
-(defun auto-scroll-bar--update (win show-v show-h)
+(defun auto-scroll-bar--update (win show-v show-h &optional persistent)
   "Update scrollbar WIN, SHOW-V, SHOW-H."
-  (let* ((bars (window-scroll-bars win))
-         (shown-v (nth 2 bars))
-         (shown-h (nth 5 bars)))
-    (when (or (not (eq shown-v show-v)) (not (eq shown-h show-h)))
-      (set-window-scroll-bars win nil show-v nil show-h t))))
+  (set-window-scroll-bars win nil show-v nil show-h persistent)
+  (save-window-excursion (ignore-errors (enlarge-window 1))))  ; refresh
 
 (defun auto-scroll-bar--show-hide (win)
   "Show/Hide scroll-bar for WIN."
@@ -78,14 +114,16 @@
 
 (defun auto-scroll-bar--change (&rest _)
   "Window state change."
-  (dolist (win (window-list))
-    (auto-scroll-bar--show-hide win)))
+  (auto-scroll-bar--with-no-redisplay
+    (dolist (win (window-list)) (auto-scroll-bar--show-hide win))))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
-  (add-hook 'post-command-hook #'auto-scroll-bar--change)
+  (add-hook 'post-command-hook #'auto-scroll-bar--change)  ; post command, less buggy
+  (toggle-scroll-bar 1)
+  (toggle-horizontal-scroll-bar 1)
   (when auto-scroll-bar-hide-minibuffer
-    (auto-scroll-bar--update (minibuffer-window) nil nil)))
+    (auto-scroll-bar--update (minibuffer-window) nil nil t)))
 
 (defun auto-scroll-bar--disable ()
   "Disable function `auto-scroll-bar-mode'."
