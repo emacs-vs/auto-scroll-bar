@@ -109,16 +109,18 @@
 
 (defun auto-scroll-bar--show-h-p ()
   "Return non-nil if we should show the horizontal scroll-bar."
-  (when horizontal-scroll-bar
-    (save-excursion
-      (move-to-window-line 0)
-      (let ((count 0) (target (auto-scroll-bar--window-height)) break)
-        (while (and (not (eobp)) (< count target) (not break))
-          (if (< (auto-scroll-bar--window-width) (- (line-end-position) (line-beginning-position)))
-              (setq break t)
-            (forward-line 1)
-            (cl-incf count)))
-        break))))
+  (and
+   horizontal-scroll-bar
+   truncate-lines
+   (save-excursion
+     (move-to-window-line 0)
+     (let ((count 0) (target (auto-scroll-bar--window-height)) break)
+       (while (and (not (eobp)) (< count target) (not break))
+         (if (< (auto-scroll-bar--window-width) (- (line-end-position) (line-beginning-position)))
+             (setq break t)
+           (forward-line 1)
+           (cl-incf count)))
+       break))))
 
 (defun auto-scroll-bar--disabled-p ()
   "Return non-nil if scroll-bars should be ignored."
