@@ -145,6 +145,7 @@ and SHOW-H."
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
+  (add-hook 'window-size-change-functions #'auto-scroll-bar--change)
   (add-hook 'post-command-hook #'auto-scroll-bar--change)  ; post command, less buggy
   (toggle-scroll-bar 1)
   (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
@@ -154,6 +155,7 @@ and SHOW-H."
 
 (defun auto-scroll-bar--disable ()
   "Disable function `auto-scroll-bar-mode'."
+  (remove-hook 'window-size-change-functions #'auto-scroll-bar--change)
   (remove-hook 'post-command-hook #'auto-scroll-bar--change)
   (toggle-scroll-bar -1)
   (toggle-horizontal-scroll-bar -1))
