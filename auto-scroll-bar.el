@@ -1,13 +1,13 @@
-;;; auto-scroll-bar.el --- Automatically show/hide scroll-bar  -*- lexical-binding: t; -*-
+;;; auto-scroll-bar.el --- Automatically show/hide scroll-bars as needed  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  Shen, Jen-Chieh
 ;; Created date 2022-03-01 03:32:33
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
-;; Description: Automatically show/hide scroll-bar.
+;; Description: Automatically show/hide scroll-bars as needed.
 ;; Keyword: scrollbar
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "26.1"))
 ;; URL: https://github.com/jcs-elpa/auto-scroll-bar
 
 ;; This file is NOT part of GNU Emacs.
@@ -27,7 +27,7 @@
 
 ;;; Commentary:
 ;;
-;; Automatically show/hide scroll-bar.
+;; Automatically show/hide scroll-bars as needed.
 ;;
 
 ;;; Code:
@@ -35,7 +35,7 @@
 (require 'scroll-bar)
 
 (defgroup auto-scroll-bar nil
-  "Automatically show/hide scroll-bar."
+  "Automatically show/hide scroll-bars as needed."
   :prefix "auto-scroll-bar-"
   :group 'tool
   :link '(url-link :tag "Repository" "https://github.com/jcs-elpa/auto-scroll-bar"))
@@ -99,7 +99,7 @@
       break)))
 
 (defun auto-scroll-bar--update (win show-v show-h &optional persistent)
-  "Update scrollbar WIN, SHOW-V, SHOW-H."
+  "Update scrollbar WIN, SHOW-V, SHOW-H, PERSISTENT."
   (set-window-scroll-bars win nil show-v nil show-h persistent)
   (save-window-excursion (ignore-errors (enlarge-window 1))))  ; refresh
 
@@ -115,7 +115,7 @@
 (defun auto-scroll-bar--change (&rest _)
   "Window state change."
   (auto-scroll-bar--with-no-redisplay
-    (dolist (win (window-list)) (auto-scroll-bar--show-hide win))))
+   (dolist (win (window-list)) (auto-scroll-bar--show-hide win))))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
