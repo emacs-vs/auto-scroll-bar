@@ -104,7 +104,8 @@
 (defun auto-scroll-bar--show-v-p ()
   "Return non-nil if we should show the vertical scroll-bar."
   (and vertical-scroll-bar
-       (not (string= (format-mode-line mode-line-percent-position) "All"))))
+       (not (and (= (point-min) (window-start))
+                 (= (point-max) (window-end nil t))))))
 
 (defun auto-scroll-bar--show-h-p ()
   "Return non-nil if we should show the horizontal scroll-bar."
