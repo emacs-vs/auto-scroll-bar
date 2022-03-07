@@ -6,6 +6,13 @@
 
 [![CI](https://github.com/jcs-elpa/auto-scroll-bar/actions/workflows/test.yml/badge.svg)](https://github.com/jcs-elpa/auto-scroll-bar/actions/workflows/test.yml)
 
+<p align="center">
+  <img src="./etc/demo.gif"/>
+</p>
+
+After Emacs 29.1, Emacs will respect to Windows' theme settings which allows user
+to use Dark-Mode scroll bar inside Emacs!
+
 ## 🔨 Usage
 
 Put this in your config,
