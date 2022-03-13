@@ -141,8 +141,8 @@ and SHOW-H."
 (defun auto-scroll-bar--update (win show-v show-h &optional persistent)
   "Update scrollbar WIN, SHOW-V, SHOW-H, PERSISTENT."
   (when (auto-scroll-bar--toggle-p win show-v show-h)
-    (set-window-scroll-bars win nil show-v nil show-h persistent))
-  (save-window-excursion (ignore-errors (enlarge-window 1))))  ; refresh
+    (set-window-scroll-bars win nil show-v nil show-h persistent)
+    (save-window-excursion (ignore-errors (enlarge-window 1)))))  ; refresh
 
 (defun auto-scroll-bar--show-hide (win)
   "Show/Hide scroll-bar for WIN."
