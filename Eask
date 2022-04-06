@@ -1,6 +1,7 @@
 (package "auto-scroll-bar"
          "0.1.0"
          "Automatically show/hide scroll-bars as needed")
+
 (package-file "auto-scroll-bar.el")
 
 (source "gnu")
