@@ -1,5 +1,5 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![JCS-ELPA](https://raw.githubusercontent.com/jcs-emacs/jcs-elpa/master/badges/v/auto-scroll-bar.svg)](https://jcs-emacs.github.io/jcs-elpa/#/auto-scroll-bar)
+[![JCS-ELPA](https://raw.githubusercontent.com/jcs-emacs/badges/master/elpa/v/auto-scroll-bar.svg)](https://jcs-emacs.github.io/jcs-elpa/#/auto-scroll-bar)
 
 # auto-scroll-bar
 > Automatically show/hide scroll-bars as needed
