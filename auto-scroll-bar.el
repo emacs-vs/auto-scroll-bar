@@ -4,11 +4,10 @@
 ;; Created date 2022-03-01 03:32:33
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
-;; Description: Automatically show/hide scroll-bars as needed.
-;; Keyword: scrollbar
+;; URL: https://github.com/jcs-elpa/auto-scroll-bar
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "26.1"))
-;; URL: https://github.com/jcs-elpa/auto-scroll-bar
+;; Keywords: scrollbar
 
 ;; This file is NOT part of GNU Emacs.
 

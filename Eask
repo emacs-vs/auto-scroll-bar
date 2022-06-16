@@ -2,6 +2,9 @@
          "0.1.0"
          "Automatically show/hide scroll-bars as needed")
 
+(website-url "https://github.com/jcs-elpa/auto-scroll-bar")
+(keywords "scrollbar")
+
 (package-file "auto-scroll-bar.el")
 
 (source "gnu")
