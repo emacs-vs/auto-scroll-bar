@@ -170,11 +170,13 @@ and SHOW-H."
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
-  (add-hook 'window-size-change-functions #'auto-scroll-bar--size-change)
-  (add-hook 'window-scroll-functions #'auto-scroll-bar--scroll)
-  (toggle-scroll-bar 1)
-  (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
-  (auto-scroll-bar--size-change))  ; execute once
+  (cond ((display-graphic-p)
+         (add-hook 'window-size-change-functions #'auto-scroll-bar--size-change)
+         (add-hook 'window-scroll-functions #'auto-scroll-bar--scroll)
+         (toggle-scroll-bar 1)
+         (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
+         (auto-scroll-bar--size-change))  ; execute once
+        (t (auto-scroll-bar-mode -1))))
 
 (defun auto-scroll-bar--disable ()
   "Disable function `auto-scroll-bar-mode'."
