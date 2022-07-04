@@ -7,7 +7,7 @@
 ;; URL: https://github.com/jcs-elpa/auto-scroll-bar
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "26.1"))
-;; Keywords: scrollbar
+;; Keywords: convenience scrollbar
 
 ;; This file is NOT part of GNU Emacs.
 
