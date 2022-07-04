@@ -3,7 +3,7 @@
          "Automatically show/hide scroll-bars as needed")
 
 (website-url "https://github.com/jcs-elpa/auto-scroll-bar")
-(keywords "scrollbar")
+(keywords "convenience" "scrollbar")
 
 (package-file "auto-scroll-bar.el")
 
