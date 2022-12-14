@@ -53,7 +53,7 @@
   :group 'auto-scroll-bar)
 
 (defcustom auto-scroll-bar-hide-minibuffer t
-  "List of buffers to disable the scroll bar completely."
+  "Non-nil to hide scrollbar in minibuffer."
   :type 'boolean
   :group 'auto-scroll-bar)
 
@@ -71,7 +71,6 @@
   (declare (indent 0) (debug t))
   `(let ((inhibit-redisplay t)
          (inhibit-modification-hooks t)
-         (inhibit-point-motion-hooks t)
          after-focus-change-function
          buffer-list-update-hook
          display-buffer-alist
@@ -83,12 +82,7 @@
 
 (defun auto-scroll-bar--window-width ()
   "Calculate inner window width."
-  (let ((width (window-width)))
-    (when (bound-and-true-p display-line-numbers-mode)
-      (cl-decf width (line-number-display-width)))
-    (when vertical-scroll-bar
-      (cl-decf width (scroll-bar-columns (get-scroll-bar-mode))))
-    width))
+  (window-max-chars-per-line))
 
 (defun auto-scroll-bar--window-height ()
   "Calculate inner window height."
@@ -114,9 +108,11 @@
    truncate-lines
    (save-excursion
      (move-to-window-line 0)
-     (let ((count 0) (target (auto-scroll-bar--window-height)) break)
+     (let* ((win-w (auto-scroll-bar--window-width))
+            (win-h (auto-scroll-bar--window-height))
+            (count 0) (target win-h) break)
        (while (and (not (eobp)) (< count target) (not break))
-         (if (< (auto-scroll-bar--window-width) (- (line-end-position) (line-beginning-position)))
+         (if (< win-w (- (line-end-position) (line-beginning-position)))
              (setq break t)
            (forward-line 1)
            (cl-incf count)))
@@ -141,7 +137,7 @@ and SHOW-H."
   "Update scrollbar WIN, SHOW-V, SHOW-H, PERSISTENT."
   (when (auto-scroll-bar--toggle-p win show-v show-h)
     (set-window-scroll-bars win nil show-v nil show-h persistent)
-    (save-window-excursion (ignore-errors (enlarge-window 1)))))  ; refresh
+    (save-window-excursion (ignore-errors (window-resize win 0)))))  ; refresh
 
 (defun auto-scroll-bar--show-hide (win)
   "Show/Hide scroll-bar for WIN."
@@ -152,16 +148,16 @@ and SHOW-H."
             (show-h (auto-scroll-bar--show-h-p)))
         (auto-scroll-bar--update win show-v show-h)))))
 
-(defun auto-scroll-bar--hide-minibuffer ()
+(defun auto-scroll-bar--hide-minibuffer (&optional frame)
   "Hide minibuffer when variable `auto-scroll-bar-hide-minibuffer' is enabled."
   (when auto-scroll-bar-hide-minibuffer
-    (auto-scroll-bar--update (minibuffer-window) nil nil t)))
+    (auto-scroll-bar--update (minibuffer-window frame) nil nil t)))
 
-(defun auto-scroll-bar--size-change (&rest _)
+(defun auto-scroll-bar--size-change (&optional frame &rest _)
   "Show/Hide all visible windows."
   (auto-scroll-bar--with-no-redisplay
-    (dolist (win (window-list)) (auto-scroll-bar--show-hide win))
-    (auto-scroll-bar--hide-minibuffer)))
+    (dolist (win (window-list frame)) (auto-scroll-bar--show-hide win))
+    (auto-scroll-bar--hide-minibuffer frame)))
 
 (defun auto-scroll-bar--scroll (&optional window &rest _)
   "Show/Hide scroll-bar on WINDOW."
@@ -187,7 +183,7 @@ and SHOW-H."
 
 ;;;###autoload
 (define-minor-mode auto-scroll-bar-mode
-  "Minor mode 'auto-scroll-bar-mode'."
+  "Minor mode `auto-scroll-bar-mode'."
   :global t
   :require 'auto-scroll-bar-mode
   :group 'auto-scroll-bar
