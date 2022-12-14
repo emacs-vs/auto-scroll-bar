@@ -11,6 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 * Use window start/end instead of mode-line format to calculate buffer percentage (30286ef015183d1229de605a7b30062813ed0794)
 * Fix when truncate lines disabled (dd966bb9b0b858d028c0af7399f6edba1d22c450)
 * Don't enable inside terminal (8bda044ad7b741abc239b9df177e65ad0f969ea9)
+* Fix show horizontal scroll bar's logic (afda338ccd67456142361be610a6bdd7e2360143)
 
 ## 0.1.0
 > Released Mar 02, 2022
