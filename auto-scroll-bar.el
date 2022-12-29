@@ -168,9 +168,9 @@ Optional argument FRAME is used to select frame's minibuffer."
 
 (defun auto-scroll-bar--after-change (&rest _)
   "After change hook."
-  (if (eq (minibuffer-window) (selected-window))
-      (auto-scroll-bar--hide-minibuffer)
-    (auto-scroll-bar--scroll (selected-window))))
+  (when-let ((current (selected-window)))
+    (if (equal (minibuffer-window) current) (auto-scroll-bar--hide-minibuffer)
+      (auto-scroll-bar--scroll current))))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
