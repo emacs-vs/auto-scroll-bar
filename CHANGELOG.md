@@ -5,8 +5,13 @@ All notable changes to this project will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 
-## 0.1.1 (Unreleased)
+## 0.1.2 (Unreleased)
 > Released N/A
+
+* N/A
+
+## 0.1.1
+> Released Dec 29, 2022
 
 * Use window start/end instead of mode-line format to calculate buffer percentage (30286ef015183d1229de605a7b30062813ed0794)
 * Fix when truncate lines disabled (dd966bb9b0b858d028c0af7399f6edba1d22c450)
