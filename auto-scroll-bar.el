@@ -166,7 +166,7 @@ Optional argument FRAME is used to select frame's minibuffer."
   (auto-scroll-bar--with-no-redisplay
     (when (windowp window) (auto-scroll-bar--show-hide window))))
 
-(defun auto-scroll-bar--after-change (&rest _)
+(defun auto-scroll-bar--post-command (&rest _)
   "After change hook."
   (when-let ((current (selected-window)))
     (if (equal (minibuffer-window) current) (auto-scroll-bar--hide-minibuffer)
@@ -177,7 +177,7 @@ Optional argument FRAME is used to select frame's minibuffer."
   (cond ((display-graphic-p)
          (add-hook 'window-size-change-functions #'auto-scroll-bar--size-change)
          (add-hook 'window-scroll-functions #'auto-scroll-bar--scroll)
-         (add-hook 'after-change-functions #'auto-scroll-bar--after-change)
+         (add-hook 'post-command-hook #'auto-scroll-bar--post-command)
          (toggle-scroll-bar 1)
          (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
          (auto-scroll-bar--size-change))  ; execute once
@@ -187,7 +187,7 @@ Optional argument FRAME is used to select frame's minibuffer."
   "Disable function `auto-scroll-bar-mode'."
   (remove-hook 'window-size-change-functions #'auto-scroll-bar--size-change)
   (remove-hook 'window-scroll-functions #'auto-scroll-bar--scroll)
-  (remove-hook 'after-change-functions #'auto-scroll-bar--after-change)
+  (remove-hook 'post-command-hook #'auto-scroll-bar--post-command)
   (toggle-scroll-bar -1)
   (toggle-horizontal-scroll-bar -1))
 
