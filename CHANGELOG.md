@@ -8,7 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## 0.1.2 (Unreleased)
 > Released N/A
 
-* N/A
+* Use `post-command` instead of `after-change` for performance (9cdec11a23601af7dc9ebbaf8b8140245f91ec6f)
 
 ## 0.1.1
 > Released Dec 29, 2022
