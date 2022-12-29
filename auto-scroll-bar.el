@@ -149,12 +149,14 @@ and SHOW-H."
         (auto-scroll-bar--update win show-v show-h)))))
 
 (defun auto-scroll-bar--hide-minibuffer (&optional frame)
-  "Hide minibuffer when variable `auto-scroll-bar-hide-minibuffer' is enabled."
+  "Hide minibuffer when variable `auto-scroll-bar-hide-minibuffer' is enabled.
+
+Optional argument FRAME is used to select frame's minibuffer."
   (when auto-scroll-bar-hide-minibuffer
     (auto-scroll-bar--update (minibuffer-window frame) nil nil t)))
 
 (defun auto-scroll-bar--size-change (&optional frame &rest _)
-  "Show/Hide all visible windows."
+  "Show/Hide all visible windows in FRAME."
   (auto-scroll-bar--with-no-redisplay
     (dolist (win (window-list frame)) (auto-scroll-bar--show-hide win))
     (auto-scroll-bar--hide-minibuffer frame)))
@@ -164,11 +166,18 @@ and SHOW-H."
   (auto-scroll-bar--with-no-redisplay
     (when (windowp window) (auto-scroll-bar--show-hide window))))
 
+(defun auto-scroll-bar--after-change (&rest _)
+  "After change hook."
+  (when-let ((current (selected-window)))
+    (if (equal (minibuffer-window) current) (auto-scroll-bar--hide-minibuffer)
+      (auto-scroll-bar--scroll current))))
+
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
   (cond ((display-graphic-p)
          (add-hook 'window-size-change-functions #'auto-scroll-bar--size-change)
          (add-hook 'window-scroll-functions #'auto-scroll-bar--scroll)
+         (add-hook 'after-change-functions #'auto-scroll-bar--after-change)
          (toggle-scroll-bar 1)
          (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
          (auto-scroll-bar--size-change))  ; execute once
@@ -178,6 +187,7 @@ and SHOW-H."
   "Disable function `auto-scroll-bar-mode'."
   (remove-hook 'window-size-change-functions #'auto-scroll-bar--size-change)
   (remove-hook 'window-scroll-functions #'auto-scroll-bar--scroll)
+  (remove-hook 'after-change-functions #'auto-scroll-bar--after-change)
   (toggle-scroll-bar -1)
   (toggle-horizontal-scroll-bar -1))
 
