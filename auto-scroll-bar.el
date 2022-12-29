@@ -167,7 +167,7 @@ Optional argument FRAME is used to select frame's minibuffer."
     (when (windowp window) (auto-scroll-bar--show-hide window))))
 
 (defun auto-scroll-bar--post-command (&rest _)
-  "After change hook."
+  "Hook for post-command."
   (when-let ((current (selected-window)))
     (if (equal (minibuffer-window) current) (auto-scroll-bar--hide-minibuffer)
       (auto-scroll-bar--scroll current))))
