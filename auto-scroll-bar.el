@@ -194,10 +194,9 @@ Optional argument FRAME is used to select frame's minibuffer."
 
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post-command."
-  (when-let ((windows (get-buffer-window-list)))
-    (dolist (window windows)
-      (if (equal (minibuffer-window) window) (auto-scroll-bar--hide-minibuffer)
-        (auto-scroll-bar--scroll window)))))
+  (dolist (window (get-buffer-window-list))
+    (if (equal (minibuffer-window) window) (auto-scroll-bar--hide-minibuffer)
+      (auto-scroll-bar--scroll window))))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
