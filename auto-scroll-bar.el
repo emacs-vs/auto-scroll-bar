@@ -66,6 +66,21 @@
 ;; (@* "Util" )
 ;;
 
+;; TODO: Use function `string-pixel-width' after 29.1
+(defun auto-scroll-bar--string-pixel-width (str)
+  "Return the width of STR in pixels."
+  (if (fboundp #'string-pixel-width)
+      (string-pixel-width str)
+    (require 'shr)
+    (shr-string-pixel-width str)))
+
+(defun auto-scroll-bar--str-len (str)
+  "Calculate STR in pixel width."
+  (let ((width (frame-char-width))
+        (len (auto-scroll-bar--string-pixel-width str)))
+    (+ (/ len width)
+       (if (zerop (% len width)) 0 1))))  ; add one if exceeed
+
 (defmacro auto-scroll-bar--with-no-redisplay (&rest body)
   "Execute BODY without any redisplay execution."
   (declare (indent 0) (debug t))
@@ -106,17 +121,21 @@
   (and
    horizontal-scroll-bar
    truncate-lines
-   (save-excursion
-     (move-to-window-line 0)
-     (let* ((win-w (auto-scroll-bar--window-width))
-            (win-h (auto-scroll-bar--window-height))
-            (count 0) (target win-h) break)
-       (while (and (not (eobp)) (< count target) (not break))
-         (if (< win-w (- (line-end-position) (line-beginning-position)))
-             (setq break t)
-           (forward-line 1)
-           (cl-incf count)))
-       break))))
+   (or (not (zerop (window-hscroll)))
+       (save-excursion
+         (move-to-window-line 0)
+         (let* ((win-w (auto-scroll-bar--window-width))
+                (win-h (auto-scroll-bar--window-height))
+                (count 0) (target win-h) break)
+           (while (and (not (eobp)) (< count target) (not break))
+             (let* ((line-str (buffer-substring-no-properties
+                               (line-beginning-position) (line-end-position)))
+                    (line-len (auto-scroll-bar--str-len line-str)))
+               (if (< win-w line-len)
+                   (setq break t)
+                 (forward-line 1)
+                 (cl-incf count))))
+           break)))))
 
 (defun auto-scroll-bar--disabled-p ()
   "Return non-nil if scroll-bars should be ignored."
