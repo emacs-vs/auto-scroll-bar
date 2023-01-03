@@ -62,6 +62,9 @@
   :type 'boolean
   :group 'auto-scroll-bar)
 
+(defvar auto-scroll-bar--timer nil
+  "Timer to refresh after post-command.")
+
 ;;
 ;; (@* "Externals" )
 ;;
@@ -194,9 +197,14 @@ Optional argument FRAME is used to select frame's minibuffer."
 
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post-command."
-  (when-let ((current (selected-window)))
-    (if (equal (minibuffer-window) current) (auto-scroll-bar--hide-minibuffer)
-      (auto-scroll-bar--scroll current))))
+  (when-let ((windows (get-buffer-window-list)))
+    (dolist (window windows)
+      (if (equal (minibuffer-window) window) (auto-scroll-bar--hide-minibuffer)
+        (auto-scroll-bar--scroll window))))
+  ;; Start refresh
+  (when (timerp auto-scroll-bar--timer) (cancel-timer auto-scroll-bar--timer))
+  (setq auto-scroll-bar--timer
+        (run-with-idle-timer 0 nil #'auto-scroll-bar--scroll (selected-window))))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
