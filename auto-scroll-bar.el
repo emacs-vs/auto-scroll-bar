@@ -128,21 +128,26 @@
   (and
    horizontal-scroll-bar
    truncate-lines
-   (or (not (zerop (window-hscroll)))
-       (save-excursion
-         (move-to-window-line 0)
-         (let* ((win-w (auto-scroll-bar--window-width))
-                (win-h (auto-scroll-bar--window-height))
-                (count 0) (target win-h) break)
-           (while (and (not (eobp)) (< count target) (not break))
-             (let* ((line-str (buffer-substring-no-properties
-                               (line-beginning-position) (line-end-position)))
-                    (line-len (auto-scroll-bar--str-len line-str)))
-               (if (< win-w line-len)
-                   (setq break t)
-                 (forward-line 1)
-                 (cl-incf count))))
-           break)))))
+   (or
+    ;; (1) When window not align to the left!
+    (let ((w-hscroll (max (- (window-hscroll) hscroll-step) 0)))
+      (and (not (zerop w-hscroll))
+           (<= w-hscroll (current-column))))
+    ;; (2) When at least one line exceeds the current window width
+    (save-excursion
+      (move-to-window-line 0)
+      (let* ((win-w (auto-scroll-bar--window-width))
+             (win-h (auto-scroll-bar--window-height))
+             (count 0) (target win-h) break)
+        (while (and (not (eobp)) (< count target) (not break))
+          (let* ((line-str (buffer-substring-no-properties
+                            (line-beginning-position) (line-end-position)))
+                 (line-len (auto-scroll-bar--str-len line-str)))
+            (if (< win-w line-len)
+                (setq break t)
+              (forward-line 1)
+              (cl-incf count))))
+        break)))))
 
 (defun auto-scroll-bar--disabled-p ()
   "Return non-nil if scroll-bars should be ignored."
