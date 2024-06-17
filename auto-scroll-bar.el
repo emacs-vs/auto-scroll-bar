@@ -4,9 +4,9 @@
 ;; Created date 2022-03-01 03:32:33
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
-;; URL: https://github.com/jcs-elpa/auto-scroll-bar
+;; URL: https://github.com/emacs-vs/auto-scroll-bar
 ;; Version: 0.1.1
-;; Package-Requires: ((emacs "27.1"))
+;; Package-Requires: ((emacs "27.1") (elenv "0.1.0"))
 ;; Keywords: convenience scrollbar
 
 ;; This file is NOT part of GNU Emacs.
@@ -34,20 +34,22 @@
 (require 'cl-lib)
 (require 'scroll-bar)
 
+(require 'elenv)
+
 (defgroup auto-scroll-bar nil
   "Automatically show/hide scroll-bars as needed."
   :prefix "auto-scroll-bar-"
   :group 'tool
-  :link '(url-link :tag "Repository" "https://github.com/jcs-elpa/auto-scroll-bar"))
+  :link '(url-link :tag "Repository" "https://github.com/emacs-vs/auto-scroll-bar"))
 
 (defcustom auto-scroll-bar-disabled-buffers
-  '()
+  nil
   "List of buffers to disable the scroll bar completely."
   :type 'list
   :group 'auto-scroll-bar)
 
 (defcustom auto-scroll-bar-disabled-major-modes
-  '()
+  nil
   "List of major-mode to disable the scroll bar completely."
   :type 'list
   :group 'auto-scroll-bar)
@@ -83,24 +85,10 @@
 
 (defun auto-scroll-bar--str-len (str)
   "Calculate STR in pixel width."
-  (let ((width (frame-char-width))
+  (let ((width (window-font-width))
         (len (auto-scroll-bar--string-pixel-width str)))
     (+ (/ len width)
        (if (zerop (% len width)) 0 1))))  ; add one if exceeed
-
-(defmacro auto-scroll-bar--with-no-redisplay (&rest body)
-  "Execute BODY without any redisplay execution."
-  (declare (indent 0) (debug t))
-  `(let ((inhibit-redisplay t)
-         (inhibit-modification-hooks t)
-         after-focus-change-function
-         buffer-list-update-hook
-         display-buffer-alist
-         window-configuration-change-hook
-         window-scroll-functions
-         window-size-change-functions
-         window-state-change-hook)
-     ,@body))
 
 (defun auto-scroll-bar--window-width ()
   "Calculate inner window width."
@@ -188,13 +176,13 @@ Optional argument FRAME is used to select frame's minibuffer."
 
 (defun auto-scroll-bar--size-change (&optional frame &rest _)
   "Show/Hide all visible windows in FRAME."
-  (auto-scroll-bar--with-no-redisplay
+  (elenv-with-no-redisplay
     (dolist (win (window-list frame)) (auto-scroll-bar--show-hide win))
     (auto-scroll-bar--hide-minibuffer frame)))
 
 (defun auto-scroll-bar--scroll (&optional window &rest _)
   "Show/Hide scroll-bar on WINDOW."
-  (auto-scroll-bar--with-no-redisplay
+  (elenv-with-no-redisplay
     (when (windowp window) (auto-scroll-bar--show-hide window))))
 
 (defun auto-scroll-bar--post-command (&rest _)
