@@ -94,48 +94,42 @@
   "Calculate inner window width."
   (window-max-chars-per-line))
 
-(defun auto-scroll-bar--window-height ()
-  "Calculate inner window height."
-  (let ((height (window-height)))
-    (when horizontal-scroll-bar
-      (cl-decf height (scroll-bar-lines)))
-    height))
-
 ;;
 ;; (@* "Core" )
 ;;
 
-(defun auto-scroll-bar--show-v-p ()
-  "Return non-nil if we should show the vertical scroll-bar."
+(defun auto-scroll-bar--show-v-p (wstart wend)
+  "Return non-nil if we should show the vertical scroll-bar.
+
+Argument WSTART and WEND is for fast access cache."
   (and vertical-scroll-bar
-       (not (and (= (point-min) (window-start))
-                 (= (point-max) (window-end nil t))))))
+       (not (and (= (point-min) wstart)
+                 (= (point-max) wend)))))
 
 (defun auto-scroll-bar--show-h-p ()
   "Return non-nil if we should show the horizontal scroll-bar."
-  (and
-   horizontal-scroll-bar
-   truncate-lines
-   (or
-    ;; (1) When window not align to the left!
-    (let ((w-hscroll (max (- (window-hscroll) hscroll-step) 0)))
-      (and (not (zerop w-hscroll))
-           (<= w-hscroll (current-column))))
-    ;; (2) When at least one line exceeds the current window width
-    (save-excursion
-      (move-to-window-line 0)
-      (let* ((win-w (auto-scroll-bar--window-width))
-             (win-h (auto-scroll-bar--window-height))
-             (count 0) (target win-h) break)
-        (while (and (not (eobp)) (< count target) (not break))
-          (let* ((line-str (buffer-substring-no-properties
-                            (line-beginning-position) (line-end-position)))
-                 (line-len (auto-scroll-bar--str-len line-str)))
-            (if (< win-w line-len)
-                (setq break t)
-              (forward-line 1)
-              (cl-incf count))))
-        break)))))
+  (and horizontal-scroll-bar
+       truncate-lines
+       (or
+        ;; (1) When window not align to the left!
+        (let ((w-hscroll (max (- (window-hscroll) hscroll-step) 0)))
+          (and (not (zerop w-hscroll))
+               (<= w-hscroll (current-column))))
+        ;; (2) When at least one line exceeds the current window width
+        (save-excursion
+          (move-to-window-line 0)
+          (let* ((win-w (auto-scroll-bar--window-width))
+                 (win-h (window-text-height))
+                 (count 0) (target win-h) break)
+            (while (and (not (eobp)) (< count target) (not break))
+              (let* ((line-str (buffer-substring-no-properties
+                                (line-beginning-position) (line-end-position)))
+                     (line-len (auto-scroll-bar--str-len line-str)))
+                (if (< win-w line-len)
+                    (setq break t)
+                  (forward-line 1)
+                  (cl-incf count))))
+            break)))))
 
 (defun auto-scroll-bar--disabled-p ()
   "Return non-nil if scroll-bars should be ignored."
@@ -160,12 +154,17 @@ and SHOW-H."
 
 (defun auto-scroll-bar--show-hide (win)
   "Show/Hide scroll-bar for WIN."
-  (with-selected-window win
-    (if (auto-scroll-bar--disabled-p)
-        (auto-scroll-bar--update win nil nil)
-      (let ((show-v (auto-scroll-bar--show-v-p))
-            (show-h (auto-scroll-bar--show-h-p)))
-        (auto-scroll-bar--update win show-v show-h)))))
+  (cond ((equal (minibuffer-window) win)
+         (auto-scroll-bar--hide-minibuffer))
+        (t
+         (with-selected-window win
+           (if (auto-scroll-bar--disabled-p)
+               (auto-scroll-bar--update win nil nil)
+             (let* ((wend (window-end nil t))
+                    (wstart (window-start))
+                    (show-v (auto-scroll-bar--show-v-p wstart wend))
+                    (show-h (auto-scroll-bar--show-h-p)))
+               (auto-scroll-bar--update win show-v show-h)))))))
 
 (defun auto-scroll-bar--hide-minibuffer (&optional frame)
   "Hide minibuffer when variable `auto-scroll-bar-hide-minibuffer' is enabled.
@@ -177,8 +176,7 @@ Optional argument FRAME is used to select frame's minibuffer."
 (defun auto-scroll-bar--size-change (&optional frame &rest _)
   "Show/Hide all visible windows in FRAME."
   (elenv-with-no-redisplay
-    (dolist (win (window-list frame)) (auto-scroll-bar--show-hide win))
-    (auto-scroll-bar--hide-minibuffer frame)))
+    (dolist (win (window-list frame)) (auto-scroll-bar--show-hide win))))
 
 (defun auto-scroll-bar--scroll (&optional window &rest _)
   "Show/Hide scroll-bar on WINDOW."
@@ -188,8 +186,7 @@ Optional argument FRAME is used to select frame's minibuffer."
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post-command."
   (dolist (window (get-buffer-window-list))
-    (if (equal (minibuffer-window) window) (auto-scroll-bar--hide-minibuffer)
-      (auto-scroll-bar--scroll window))))
+    (auto-scroll-bar--scroll window)))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
