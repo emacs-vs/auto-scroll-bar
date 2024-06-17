@@ -84,10 +84,8 @@ Argument WSTART and WEND is for fast access cache."
        (not (and (= (point-min) wstart)
                  (= (point-max) wend)))))
 
-(defun auto-scroll-bar--show-h-p (_wstart _wend)
-  "Return non-nil if we should show the horizontal scroll-bar.
-
-Argument WSTART and WEND is for fast access cache."
+(defun auto-scroll-bar--show-h-p ()
+  "Return non-nil if we should show the horizontal scroll-bar."
   (and horizontal-scroll-bar
        truncate-lines
        (or
@@ -130,7 +128,7 @@ and SHOW-H."
              (let* ((wend (window-end nil t))
                     (wstart (window-start))
                     (show-v (auto-scroll-bar--show-v-p wstart wend))
-                    (show-h (auto-scroll-bar--show-h-p wstart wend)))
+                    (show-h (auto-scroll-bar--show-h-p)))
                (auto-scroll-bar--update win show-v show-h)))))))
 
 (defun auto-scroll-bar--hide-minibuffer (&optional frame)
