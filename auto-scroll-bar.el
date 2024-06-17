@@ -83,16 +83,12 @@
     (require 'shr)
     (shr-string-pixel-width str)))
 
-(defun auto-scroll-bar--str-len (str)
+(defun auto-scroll-bar--str-width (str)
   "Calculate STR in pixel width."
   (let ((width (window-font-width))
         (len (auto-scroll-bar--string-pixel-width str)))
     (+ (/ len width)
        (if (zerop (% len width)) 0 1))))  ; add one if exceeed
-
-(defun auto-scroll-bar--window-width ()
-  "Calculate inner window width."
-  (window-max-chars-per-line))
 
 ;;
 ;; (@* "Core" )
@@ -106,8 +102,10 @@ Argument WSTART and WEND is for fast access cache."
        (not (and (= (point-min) wstart)
                  (= (point-max) wend)))))
 
-(defun auto-scroll-bar--show-h-p ()
-  "Return non-nil if we should show the horizontal scroll-bar."
+(defun auto-scroll-bar--show-h-p (wstart wend)
+  "Return non-nil if we should show the horizontal scroll-bar.
+
+Argument WSTART and WEND is for fast access cache."
   (and horizontal-scroll-bar
        truncate-lines
        (or
@@ -116,20 +114,10 @@ Argument WSTART and WEND is for fast access cache."
           (and (not (zerop w-hscroll))
                (<= w-hscroll (current-column))))
         ;; (2) When at least one line exceeds the current window width
-        (save-excursion
-          (move-to-window-line 0)
-          (let* ((win-w (auto-scroll-bar--window-width))
-                 (win-h (window-text-height))
-                 (count 0) (target win-h) break)
-            (while (and (not (eobp)) (< count target) (not break))
-              (let* ((line-str (buffer-substring-no-properties
-                                (line-beginning-position) (line-end-position)))
-                     (line-len (auto-scroll-bar--str-len line-str)))
-                (if (< win-w line-len)
-                    (setq break t)
-                  (forward-line 1)
-                  (cl-incf count))))
-            break)))))
+        (let* ((win-w (window-max-chars-per-line))
+               (buf (buffer-substring-no-properties wstart wend))
+               (buf-width (auto-scroll-bar--str-width buf)))
+          (< win-w buf-width)))))
 
 (defun auto-scroll-bar--disabled-p ()
   "Return non-nil if scroll-bars should be ignored."
@@ -163,7 +151,7 @@ and SHOW-H."
              (let* ((wend (window-end nil t))
                     (wstart (window-start))
                     (show-v (auto-scroll-bar--show-v-p wstart wend))
-                    (show-h (auto-scroll-bar--show-h-p)))
+                    (show-h (auto-scroll-bar--show-h-p wstart wend)))
                (auto-scroll-bar--update win show-v show-h)))))))
 
 (defun auto-scroll-bar--hide-minibuffer (&optional frame)
