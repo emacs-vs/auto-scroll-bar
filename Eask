@@ -2,7 +2,7 @@
          "0.1.1"
          "Automatically show/hide scroll-bars as needed")
 
-(website-url "https://github.com/jcs-elpa/auto-scroll-bar")
+(website-url "https://github.com/emacs-vs/auto-scroll-bar")
 (keywords "convenience" "scrollbar")
 
 (package-file "auto-scroll-bar.el")
