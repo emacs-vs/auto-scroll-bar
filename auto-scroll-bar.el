@@ -6,7 +6,7 @@
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; URL: https://github.com/emacs-vs/auto-scroll-bar
 ;; Version: 0.1.1
-;; Package-Requires: ((emacs "27.1") (elenv "0.1.0"))
+;; Package-Requires: ((emacs "29.1") (elenv "0.1.0"))
 ;; Keywords: convenience scrollbar
 
 ;; This file is NOT part of GNU Emacs.
@@ -65,28 +65,13 @@
   :group 'auto-scroll-bar)
 
 ;;
-;; (@* "Externals" )
-;;
-
-(declare-function string-pixel-width "subr-x.el")   ; TODO: remove this after 29.1
-(declare-function shr-string-pixel-width "shr.el")  ; TODO: remove this after 29.1
-
-;;
 ;; (@* "Util" )
 ;;
-
-;; TODO: Use function `string-pixel-width' after 29.1
-(defun auto-scroll-bar--string-pixel-width (str)
-  "Return the width of STR in pixels."
-  (if (fboundp #'string-pixel-width)
-      (string-pixel-width str)
-    (require 'shr)
-    (shr-string-pixel-width str)))
 
 (defun auto-scroll-bar--str-width (str)
   "Calculate STR in pixel width."
   (let ((width (window-font-width))
-        (len (auto-scroll-bar--string-pixel-width str)))
+        (len (string-pixel-width str)))
     (+ (/ len width)
        (if (zerop (% len width)) 0 1))))  ; add one if exceeed
 
