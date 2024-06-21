@@ -139,12 +139,20 @@ and SHOW-H."
                     (show-h (auto-scroll-bar--show-h-p wstart wend)))
                (auto-scroll-bar--update win show-v show-h)))))))
 
+(defun auto-scroll-bar--hide-buffer (buffer-or-name)
+  "Hide scroll bar in BUFFER-OR-NAME."
+  (when-let ((windows (get-buffer-window-list buffer-or-name)))
+    (dolist (win windows)
+      (auto-scroll-bar--update win nil nil t))))
+
 (defun auto-scroll-bar--hide-minibuffer (&optional frame)
   "Hide minibuffer when variable `auto-scroll-bar-hide-minibuffer' is enabled.
 
 Optional argument FRAME is used to select frame's minibuffer."
   (when auto-scroll-bar-hide-minibuffer
-    (auto-scroll-bar--update (minibuffer-window frame) nil nil t)))
+    (auto-scroll-bar--update (minibuffer-window frame) nil nil t)
+    (auto-scroll-bar--hide-buffer " *Echo Area 0*")
+    (auto-scroll-bar--hide-buffer " *Echo Area 1*")))
 
 (defun auto-scroll-bar--size-change (&optional frame &rest _)
   "Show/Hide all visible windows in FRAME."
