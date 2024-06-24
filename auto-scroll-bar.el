@@ -182,8 +182,8 @@ Optional argument FRAME is used to select frame's minibuffer."
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
   (cond ((display-graphic-p)
-         (add-hook 'window-size-change-functions #'auto-scroll-bar--size-change)
-         (add-hook 'window-scroll-functions #'auto-scroll-bar--scroll)
+         (add-hook 'window-size-change-functions #'auto-scroll-bar--size-change 90)
+         (add-hook 'window-scroll-functions #'auto-scroll-bar--scroll 90)
          (add-hook 'post-command-hook #'auto-scroll-bar--post-command 90)
          (toggle-scroll-bar 1)
          (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
