@@ -176,6 +176,9 @@ Optional argument FRAME is used to select frame's minibuffer."
   (elenv-with-no-redisplay
     (auto-scroll-bar--show-hide window)))
 
+;; XXX: Only for horizontal scroll.
+;;
+;; The hook `window-scroll-functions' doesn't get called on horizontal scroll.
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post-command."
   (dolist (window (get-buffer-window-list))
