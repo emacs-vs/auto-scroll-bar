@@ -68,6 +68,14 @@
 ;; (@* "Util" )
 ;;
 
+(defmacro auto-scroll-bar--with-window (win &rest body)
+  "Run BODY only when WIN is valid."
+  (declare (indent 1) (debug t))
+  `(when-let* (((and (windowp ,win) (window-live-p ,win)))
+               (frame (window-frame ,win))
+               ((and (frame-live-p frame) (frame-visible-p frame))))
+     ,@body))
+
 (defun auto-scroll-bar--str-width (str)
   "Calculate STR in pixel width."
   (let ((width (window-font-width))
@@ -127,17 +135,18 @@ and SHOW-H."
 
 (defun auto-scroll-bar--show-hide (win)
   "Show/Hide scroll-bar for WIN."
-  (cond ((equal (minibuffer-window) win)
-         (auto-scroll-bar--hide-minibuffer))
-        (t
-         (with-selected-window win
-           (if (auto-scroll-bar--disabled-p)
-               (auto-scroll-bar--update win nil nil)
-             (let* ((wend (window-end nil t))
-                    (wstart (window-start))
-                    (show-v (auto-scroll-bar--show-v-p wstart wend))
-                    (show-h (auto-scroll-bar--show-h-p wstart wend)))
-               (auto-scroll-bar--update win show-v show-h)))))))
+  (auto-scroll-bar--with-window win
+    (cond ((equal (minibuffer-window) win)
+           (auto-scroll-bar--hide-minibuffer))
+          (t
+           (with-selected-window win
+             (if (auto-scroll-bar--disabled-p)
+                 (auto-scroll-bar--update win nil nil)
+               (let* ((wend (window-end nil t))
+                      (wstart (window-start))
+                      (show-v (auto-scroll-bar--show-v-p wstart wend))
+                      (show-h (auto-scroll-bar--show-h-p wstart wend)))
+                 (auto-scroll-bar--update win show-v show-h))))))))
 
 (defun auto-scroll-bar--hide-buffer (buffer-or-name)
   "Hide scroll bar in BUFFER-OR-NAME."
@@ -156,13 +165,14 @@ Optional argument FRAME is used to select frame's minibuffer."
 
 (defun auto-scroll-bar--size-change (&optional frame &rest _)
   "Show/Hide all visible windows in FRAME."
-  (elenv-with-no-redisplay
-    (dolist (win (window-list frame)) (auto-scroll-bar--show-hide win))))
+  (when (frame-live-p frame)
+    (elenv-with-no-redisplay
+      (dolist (win (window-list frame)) (auto-scroll-bar--show-hide win)))))
 
 (defun auto-scroll-bar--scroll (&optional window &rest _)
   "Show/Hide scroll-bar on WINDOW."
   (elenv-with-no-redisplay
-    (when (windowp window) (auto-scroll-bar--show-hide window))))
+    (auto-scroll-bar--show-hide window)))
 
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post-command."
