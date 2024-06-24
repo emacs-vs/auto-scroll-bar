@@ -68,12 +68,12 @@
 ;; (@* "Util" )
 ;;
 
-(defmacro auto-scroll-bar--with-window (win &rest body)
+(defmacro auto-scroll-bar--ensure-frame (win &rest body)
   "Run BODY only when WIN is valid."
   (declare (indent 1) (debug t))
   `(when-let* (((and (windowp ,win) (window-live-p ,win)))
                (frame (window-frame ,win))
-               ((and (frame-live-p frame) (frame-visible-p frame))))
+               ((frame-live-p frame)))
      ,@body))
 
 (defun auto-scroll-bar--str-width (str)
@@ -135,7 +135,7 @@ and SHOW-H."
 
 (defun auto-scroll-bar--show-hide (win)
   "Show/Hide scroll-bar for WIN."
-  (auto-scroll-bar--with-window win
+  (auto-scroll-bar--ensure-frame win
     (cond ((equal (minibuffer-window) win)
            (auto-scroll-bar--hide-minibuffer))
           (t
@@ -184,7 +184,7 @@ Optional argument FRAME is used to select frame's minibuffer."
   (cond ((display-graphic-p)
          (add-hook 'window-size-change-functions #'auto-scroll-bar--size-change)
          (add-hook 'window-scroll-functions #'auto-scroll-bar--scroll)
-         (add-hook 'post-command-hook #'auto-scroll-bar--post-command)
+         (add-hook 'post-command-hook #'auto-scroll-bar--post-command 90)
          (toggle-scroll-bar 1)
          (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
          (auto-scroll-bar--size-change))  ; execute once
