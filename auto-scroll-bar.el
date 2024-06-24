@@ -71,10 +71,12 @@
 (defmacro auto-scroll-bar--ensure-frame (win &rest body)
   "Run BODY only when WIN is valid."
   (declare (indent 1) (debug t))
-  `(when-let* (((and (windowp ,win) (window-live-p ,win)))
-               (frame (window-frame ,win))
-               ((frame-live-p frame)))
-     ,@body))
+  `(let ((after-delete-frame-functions)
+         (after-focus-change-function))
+     (when-let* (((and (windowp ,win) (window-live-p ,win)))
+                 (frame (window-frame ,win))
+                 ((frame-live-p frame)))
+       ,@body)))
 
 (defun auto-scroll-bar--str-width (str)
   "Calculate STR in pixel width."
