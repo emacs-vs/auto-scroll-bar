@@ -89,12 +89,13 @@
 ;; (@* "Core" )
 ;;
 
-(defun auto-scroll-bar--show-v-p (_wstart _wend)
+(defun auto-scroll-bar--show-v-p (wstart wend)
   "Return non-nil if we should show the vertical scroll-bar.
 
 Argument WSTART and WEND is for fast access cache."
   (and vertical-scroll-bar
-       (not (equal (format-mode-line "%p") "All"))))
+       (not (and (= (point-min) wstart)
+                 (= (point-max) wend)))))
 
 (defun auto-scroll-bar--show-h-p (wstart wend)
   "Return non-nil if we should show the horizontal scroll-bar.
@@ -108,9 +109,9 @@ Argument WSTART and WEND is for fast access cache."
           (and (not (zerop w-hscroll))
                (<= w-hscroll (current-column))))
         ;; (2) When at least one line exceeds the current window width
-        (let* ((win-w (window-max-chars-per-line))
-               (buf (buffer-substring-no-properties wstart wend))
-               (buf-width (auto-scroll-bar--str-width buf)))
+        (when-let* ((win-w (window-max-chars-per-line))
+                    (buf (ignore-errors (buffer-substring-no-properties wstart wend)))
+                    (buf-width (auto-scroll-bar--str-width buf)))
           (< win-w buf-width)))))
 
 (defun auto-scroll-bar--disabled-p ()
@@ -131,8 +132,7 @@ and SHOW-H."
 (defun auto-scroll-bar--update (win show-v show-h &optional persistent)
   "Update scrollbar WIN, SHOW-V, SHOW-H, PERSISTENT."
   (when (auto-scroll-bar--toggle-p win show-v show-h)
-    (set-window-scroll-bars win nil show-v nil show-h persistent)
-    (save-window-excursion (ignore-errors (window-resize win 0)))))  ; refresh
+    (set-window-scroll-bars win nil show-v nil show-h persistent)))
 
 (defun auto-scroll-bar--show-hide (win)
   "Show/Hide scroll-bar for WIN."
@@ -143,7 +143,7 @@ and SHOW-H."
            (with-selected-window win
              (if (auto-scroll-bar--disabled-p)
                  (auto-scroll-bar--update win nil nil)
-               (let* ((wend (window-end))
+               (let* ((wend (window-end nil t))
                       (wstart (window-start))
                       (show-v (auto-scroll-bar--show-v-p wstart wend))
                       (show-h (auto-scroll-bar--show-h-p wstart wend)))
@@ -166,9 +166,9 @@ Optional argument FRAME is used to select frame's minibuffer."
 
 (defun auto-scroll-bar--size-change (&optional frame &rest _)
   "Show/Hide all visible windows in FRAME."
-  (when (frame-live-p frame)
-    (elenv-with-no-redisplay
-      (dolist (win (window-list frame)) (auto-scroll-bar--show-hide win)))))
+  (elenv-with-no-redisplay
+    (dolist (win (window-list frame))
+      (auto-scroll-bar--show-hide win))))
 
 (defun auto-scroll-bar--scroll (&optional window &rest _)
   "Show/Hide scroll-bar on WINDOW."
