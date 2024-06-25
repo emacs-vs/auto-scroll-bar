@@ -89,13 +89,12 @@
 ;; (@* "Core" )
 ;;
 
-(defun auto-scroll-bar--show-v-p (wstart wend)
+(defun auto-scroll-bar--show-v-p (_wstart _wend)
   "Return non-nil if we should show the vertical scroll-bar.
 
 Argument WSTART and WEND is for fast access cache."
   (and vertical-scroll-bar
-       (not (and (= (point-min) wstart)
-                 (= (point-max) wend)))))
+       (not (equal (format-mode-line "%p") "All"))))
 
 (defun auto-scroll-bar--show-h-p (wstart wend)
   "Return non-nil if we should show the horizontal scroll-bar.
@@ -144,7 +143,7 @@ and SHOW-H."
            (with-selected-window win
              (if (auto-scroll-bar--disabled-p)
                  (auto-scroll-bar--update win nil nil)
-               (let* ((wend (window-end nil t))
+               (let* ((wend (window-end))
                       (wstart (window-start))
                       (show-v (auto-scroll-bar--show-v-p wstart wend))
                       (show-h (auto-scroll-bar--show-h-p wstart wend)))
