@@ -181,8 +181,7 @@ Optional argument FRAME is used to select frame's minibuffer."
 ;; The hook `window-scroll-functions' doesn't get called on horizontal scroll.
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post-command."
-  (dolist (window (get-buffer-window-list))
-    (auto-scroll-bar--scroll window)))
+  (auto-scroll-bar--scroll (selected-window)))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
