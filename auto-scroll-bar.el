@@ -149,6 +149,14 @@ and SHOW-H."
                       (show-h (auto-scroll-bar--show-h-p wstart wend)))
                  (auto-scroll-bar--update win show-v show-h))))))))
 
+(defun auto-scroll-bar--schedule-display (window)
+  "Schedule the display on the next redisplay in WINDOW."
+  (let ((timer (window-parameter window 'auto-scroll-bar-timer)))
+    (when (timerp timer)
+      (cancel-timer timer))
+    (set-window-parameter window 'auto-scroll-bar-timer
+                          (run-with-timer 0.0 nil #'auto-scroll-bar--show-hide window))))
+
 (defun auto-scroll-bar--hide-buffer (buffer-or-name)
   "Hide scroll bar in BUFFER-OR-NAME."
   (when-let ((windows (get-buffer-window-list buffer-or-name)))
@@ -167,13 +175,13 @@ Optional argument FRAME is used to select frame's minibuffer."
 (defun auto-scroll-bar--size-change (&optional frame &rest _)
   "Show/Hide all visible windows in FRAME."
   (elenv-with-no-redisplay
-    (dolist (win (window-list frame))
-      (auto-scroll-bar--show-hide win))))
+    (dolist (window (window-list frame))
+      (auto-scroll-bar--schedule-display window))))
 
 (defun auto-scroll-bar--scroll (&optional window &rest _)
   "Show/Hide scroll-bar on WINDOW."
   (elenv-with-no-redisplay
-    (auto-scroll-bar--show-hide window)))
+    (auto-scroll-bar--schedule-display window)))
 
 ;; XXX: Only for horizontal scroll.
 ;;
