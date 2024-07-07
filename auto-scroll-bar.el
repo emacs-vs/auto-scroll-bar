@@ -64,6 +64,11 @@
   :type 'boolean
   :group 'auto-scroll-bar)
 
+(defcustom auto-scroll-bar-display-delay 0.1
+  "Seconds before display both verticl or horizontal scroll-bars."
+  :type 'float
+  :group 'auto-scroll-bar)
+
 ;;
 ;; (@* "Util" )
 ;;
@@ -154,8 +159,10 @@ and SHOW-H."
   (let ((timer (window-parameter window 'auto-scroll-bar-timer)))
     (when (timerp timer)
       (cancel-timer timer))
-    (set-window-parameter window 'auto-scroll-bar-timer
-                          (run-with-timer 0.0 nil #'auto-scroll-bar--show-hide window))))
+    (set-window-parameter
+     window 'auto-scroll-bar-timer
+     (run-with-idle-timer auto-scroll-bar-display-delay
+                          nil #'auto-scroll-bar--show-hide window))))
 
 (defun auto-scroll-bar--hide-buffer (buffer-or-name)
   "Hide scroll bar in BUFFER-OR-NAME."
