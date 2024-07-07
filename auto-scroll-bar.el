@@ -143,7 +143,9 @@ and SHOW-H."
            (with-selected-window win
              (if (auto-scroll-bar--disabled-p)
                  (auto-scroll-bar--update win nil nil)
-               (let* ((wend (window-end nil t))
+               (let* ((wend (or (window-parameter win 'window-end)
+                                (set-window-parameter win 'window-end
+                                                      (window-end nil t))))
                       (wstart (window-start))
                       (show-v (auto-scroll-bar--show-v-p wstart wend))
                       (show-h (auto-scroll-bar--show-h-p wstart wend)))
@@ -180,6 +182,7 @@ Optional argument FRAME is used to select frame's minibuffer."
 ;; The hook `window-scroll-functions' doesn't get called on horizontal scroll.
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post-command."
+  (set-window-parameter nil 'window-end nil)
   (auto-scroll-bar--scroll (selected-window)))
 
 (defun auto-scroll-bar--enable ()
