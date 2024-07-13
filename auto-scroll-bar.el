@@ -143,7 +143,7 @@ and SHOW-H."
            (with-selected-window win
              (if (auto-scroll-bar--disabled-p)
                  (auto-scroll-bar--update win nil nil)
-               (let* ((wend (or (and (not (elenv-frame-util-p))
+               (let* ((wend (or (and (not (elenv-frame-util-p))  ; force refresh
                                      (window-parameter win 'window-end))
                                 (set-window-parameter win 'window-end
                                                       (window-end nil t))))
