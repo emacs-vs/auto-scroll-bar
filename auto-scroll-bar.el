@@ -85,6 +85,14 @@
     (+ (/ len width)
        (if (zerop (% len width)) 0 1))))  ; add one if exceeed
 
+(defun auto-scroll-bar--bol-at-pos (pos)
+  "Return the line beginning position at POS."
+  (save-excursion (goto-char pos) (line-beginning-position)))
+
+(defun auto-scroll-bar--eol-at-pos (pos)
+  "Return the line end position at POS."
+  (save-excursion (goto-char pos) (line-end-position)))
+
 ;;
 ;; (@* "Core" )
 ;;
@@ -94,8 +102,8 @@
 
 Argument WSTART and WEND is for fast access cache."
   (and vertical-scroll-bar
-       (not (and (= (point-min) wstart)
-                 (= (point-max) wend)))))
+       (not (and (= (point-min) (auto-scroll-bar--bol-at-pos wstart))
+                 (= (point-max) (auto-scroll-bar--eol-at-pos wend))))))
 
 (defun auto-scroll-bar--show-h-p (wstart wend)
   "Return non-nil if we should show the horizontal scroll-bar.
