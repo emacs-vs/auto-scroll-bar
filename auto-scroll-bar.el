@@ -125,15 +125,12 @@ Argument WSTART and WEND is for fast access cache."
        truncate-lines
        (or
         ;; (1) When window not align to the left!
-        (let ((w-hscroll (max (- (or (window-parameter nil 'window-hscroll)
-                                     (window-hscroll))
-                                 hscroll-step)
-                              0)))
+        (let ((w-hscroll (max (- (window-hscroll) hscroll-step) 0)))
           (and (not (zerop w-hscroll))
                (<= w-hscroll (current-column))))
         ;; (2) When at least one line exceeds the current window width
-        (when-let* ((win-w (window-max-chars-per-line))
-                    (buf (ignore-errors (buffer-substring-no-properties wstart wend)))
+        (when-let* ((buf (ignore-errors (buffer-substring-no-properties wstart wend)))
+                    (win-w (window-max-chars-per-line))
                     (buf-width (auto-scroll-bar--str-width buf)))
           (< win-w buf-width)))))
 
