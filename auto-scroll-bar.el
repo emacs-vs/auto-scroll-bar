@@ -101,9 +101,17 @@
   "Return non-nil if we should show the vertical scroll-bar.
 
 Argument WSTART and WEND is for fast access cache."
-  (and vertical-scroll-bar
-       (not (and (= (point-min) (auto-scroll-bar--bol-at-pos wstart))
-                 (= (point-max) (auto-scroll-bar--eol-at-pos wend))))))
+  (when-let ((vertical-scroll-bar)
+             (pmin   (point-min))
+             (pmax   (point-max))
+             (vstart (auto-scroll-bar--bol-at-pos wstart))
+             (vend   (auto-scroll-bar--eol-at-pos wend)))
+    (cond ((frame-parameter nil 'company-box)
+           (not (and (= pmin vstart)
+                     (= (1- pmax) vend))))
+          (t
+           (not (and (= pmin vstart)
+                     (= pmax vend)))))))
 
 (defun auto-scroll-bar--show-h-p (wstart wend)
   "Return non-nil if we should show the horizontal scroll-bar.
