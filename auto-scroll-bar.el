@@ -163,9 +163,7 @@ and SHOW-H."
            (with-selected-window win
              (if (auto-scroll-bar--disabled-p)
                  (auto-scroll-bar--update win nil nil)
-               (let* ((wend (or (window-parameter nil 'window-end)
-                                (set-window-parameter nil 'window-end
-                                                      (window-end nil t))))
+               (let* ((wend (window-end nil t))
                       (wstart (window-start))
                       (show-v (auto-scroll-bar--show-v-p wstart wend))
                       (show-h (auto-scroll-bar--show-h-p wstart wend)))
@@ -189,7 +187,7 @@ Optional argument FRAME is used to select frame's minibuffer."
 (defun auto-scroll-bar--size-change (&optional frame &rest _)
   "Show/Hide all visible windows in FRAME."
   (elenv-with-no-redisplay
-    (dolist (win (window-list frame))
+    (dolist (win (get-buffer-window-list))
       (auto-scroll-bar--show-hide win))))
 
 (defun auto-scroll-bar--scroll (&optional window &rest _)
