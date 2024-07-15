@@ -184,10 +184,10 @@ Optional argument FRAME is used to select frame's minibuffer."
     (auto-scroll-bar--hide-buffer " *Echo Area 0*")
     (auto-scroll-bar--hide-buffer " *Echo Area 1*")))
 
-(defun auto-scroll-bar--size-change (&optional _frame &rest _)
+(defun auto-scroll-bar--size-change (&optional frame &rest _)
   "Show/Hide all visible windows in FRAME."
   (elenv-with-no-redisplay
-    (dolist (win (get-buffer-window-list))
+    (dolist (win (window-list frame))
       (auto-scroll-bar--show-hide win))))
 
 (defun auto-scroll-bar--scroll (&optional window &rest _)
@@ -200,7 +200,8 @@ Optional argument FRAME is used to select frame's minibuffer."
 ;; The hook `window-scroll-functions' doesn't get called on horizontal scroll.
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post command."
-  (auto-scroll-bar--scroll (selected-window)))
+  (elenv-with-no-redisplay
+    (auto-scroll-bar--show-hide (selected-window))))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
