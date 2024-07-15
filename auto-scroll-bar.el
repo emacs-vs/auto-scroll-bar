@@ -97,21 +97,25 @@
 ;; (@* "Core" )
 ;;
 
+(defun auto-scroll-bar--point-all-p (wstart wend)
+  "Return non-nil when point WSTART and WEND are with in the visible range."
+  (let ((pmin   (point-min))
+        (pmax   (point-max))
+        (vstart (auto-scroll-bar--bol-at-pos wstart))
+        (vend   (auto-scroll-bar--eol-at-pos wend)))
+    (cond ((frame-parameter nil 'company-box)
+           (and (<= vstart pmin)
+                (<= (1- pmax) vend)))
+          (t
+           (and (<= vstart pmin)
+                (<= pmax vend))))))
+
 (defun auto-scroll-bar--show-v-p (wstart wend)
   "Return non-nil if we should show the vertical scroll-bar.
 
 Argument WSTART and WEND is for fast access cache."
-  (when-let ((vertical-scroll-bar)
-             (pmin   (point-min))
-             (pmax   (point-max))
-             (vstart (auto-scroll-bar--bol-at-pos wstart))
-             (vend   (auto-scroll-bar--eol-at-pos wend)))
-    (cond ((frame-parameter nil 'company-box)
-           (not (and (= pmin vstart)
-                     (= (1- pmax) vend))))
-          (t
-           (not (and (= pmin vstart)
-                     (= pmax vend)))))))
+  (and vertical-scroll-bar
+       (not (auto-scroll-bar--point-all-p wstart wend))))
 
 (defun auto-scroll-bar--show-h-p (wstart wend)
   "Return non-nil if we should show the horizontal scroll-bar.
@@ -121,7 +125,10 @@ Argument WSTART and WEND is for fast access cache."
        truncate-lines
        (or
         ;; (1) When window not align to the left!
-        (let ((w-hscroll (max (- (window-hscroll) hscroll-step) 0)))
+        (let ((w-hscroll (max (- (or (window-parameter nil 'window-hscroll)
+                                     (window-hscroll))
+                                 hscroll-step)
+                              0)))
           (and (not (zerop w-hscroll))
                (<= w-hscroll (current-column))))
         ;; (2) When at least one line exceeds the current window width
@@ -159,9 +166,7 @@ and SHOW-H."
            (with-selected-window win
              (if (auto-scroll-bar--disabled-p)
                  (auto-scroll-bar--update win nil nil)
-               (let* ((wend (or (window-parameter win 'window-end)
-                                (set-window-parameter win 'window-end
-                                                      (window-end nil t))))
+               (let* ((wend (window-end nil t))
                       (wstart (window-start))
                       (show-v (auto-scroll-bar--show-v-p wstart wend))
                       (show-h (auto-scroll-bar--show-h-p wstart wend)))
@@ -198,8 +203,6 @@ Optional argument FRAME is used to select frame's minibuffer."
 ;; The hook `window-scroll-functions' doesn't get called on horizontal scroll.
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post-command."
-  (dolist (win (window-list-1 nil nil t))
-    (set-window-parameter win 'window-end nil))
   (auto-scroll-bar--scroll (selected-window)))
 
 (defun auto-scroll-bar--enable ()
