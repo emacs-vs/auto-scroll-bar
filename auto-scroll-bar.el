@@ -184,7 +184,7 @@ Optional argument FRAME is used to select frame's minibuffer."
     (auto-scroll-bar--hide-buffer " *Echo Area 0*")
     (auto-scroll-bar--hide-buffer " *Echo Area 1*")))
 
-(defun auto-scroll-bar--size-change (&optional frame &rest _)
+(defun auto-scroll-bar--size-change (&optional _frame &rest _)
   "Show/Hide all visible windows in FRAME."
   (elenv-with-no-redisplay
     (dolist (win (get-buffer-window-list))
