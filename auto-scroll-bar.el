@@ -163,7 +163,7 @@ and SHOW-H."
            (with-selected-window win
              (if (auto-scroll-bar--disabled-p)
                  (auto-scroll-bar--update win nil nil)
-               (let* ((wend (window-end nil t))
+               (let* ((wend   (window-end nil t))
                       (wstart (window-start))
                       (show-v (auto-scroll-bar--show-v-p wstart wend))
                       (show-h (auto-scroll-bar--show-h-p wstart wend)))
