@@ -163,7 +163,9 @@ and SHOW-H."
            (with-selected-window win
              (if (auto-scroll-bar--disabled-p)
                  (auto-scroll-bar--update win nil nil)
-               (let* ((wend (window-end nil t))
+               (let* ((wend (or (window-parameter nil 'window-end)
+                                (set-window-parameter nil 'window-end
+                                                      (window-end nil t))))
                       (wstart (window-start))
                       (show-v (auto-scroll-bar--show-v-p wstart wend))
                       (show-h (auto-scroll-bar--show-h-p wstart wend)))
@@ -195,11 +197,15 @@ Optional argument FRAME is used to select frame's minibuffer."
   (elenv-with-no-redisplay
     (auto-scroll-bar--show-hide window)))
 
+(defun auto-scroll-bar--pre-command (&rest _)
+  "Hook for pre command."
+  (set-window-parameter nil 'window-end nil))
+
 ;; XXX: Only for horizontal scroll.
 ;;
 ;; The hook `window-scroll-functions' doesn't get called on horizontal scroll.
 (defun auto-scroll-bar--post-command (&rest _)
-  "Hook for post-command."
+  "Hook for post command."
   (auto-scroll-bar--scroll (selected-window)))
 
 (defun auto-scroll-bar--enable ()
@@ -207,6 +213,7 @@ Optional argument FRAME is used to select frame's minibuffer."
   (cond ((display-graphic-p)
          (add-hook 'window-size-change-functions #'auto-scroll-bar--size-change 90)
          (add-hook 'window-scroll-functions #'auto-scroll-bar--scroll 90)
+         (add-hook 'pre-command-hook #'auto-scroll-bar--pre-command 90)
          (add-hook 'post-command-hook #'auto-scroll-bar--post-command 90)
          (toggle-scroll-bar 1)
          (when auto-scroll-bar-horizontal (toggle-horizontal-scroll-bar 1))
@@ -217,6 +224,7 @@ Optional argument FRAME is used to select frame's minibuffer."
   "Disable function `auto-scroll-bar-mode'."
   (remove-hook 'window-size-change-functions #'auto-scroll-bar--size-change)
   (remove-hook 'window-scroll-functions #'auto-scroll-bar--scroll)
+  (remove-hook 'pre-command-hook #'auto-scroll-bar--pre-command)
   (remove-hook 'post-command-hook #'auto-scroll-bar--post-command)
   (toggle-scroll-bar -1)
   (toggle-horizontal-scroll-bar -1))
