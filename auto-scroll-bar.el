@@ -1,6 +1,6 @@
 ;;; auto-scroll-bar.el --- Automatically show/hide scroll-bars as needed  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2024  Shen, Jen-Chieh
+;; Copyright (C) 2022-2025 Shen, Jen-Chieh
 ;; Created date 2022-03-01 03:32:33
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
