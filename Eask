@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "auto-scroll-bar"
          "0.1.1"
          "Automatically show/hide scroll-bars as needed")
