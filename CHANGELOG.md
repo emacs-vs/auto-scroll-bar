@@ -8,18 +8,18 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## 0.1.2 (Unreleased)
 > Released N/A
 
-* Use `post-command` instead of `after-change` for performance (9cdec11a23601af7dc9ebbaf8b8140245f91ec6f)
-* Display horizontal scroll bar when window no align to the left (3ddec689d2c6c45dffdb04b7b735154b6a0d4a50)
-* perf: Calculate exceed line faster (f82a004137ac4a6a9f0c0249ee506d0006427b1e)
+* Use `post-command` instead of `after-change` for performance ([`9cdec11`](../../commit/9cdec11a23601af7dc9ebbaf8b8140245f91ec6f))
+* Display horizontal scroll bar when window no align to the left ([`3ddec68`](../../commit/3ddec689d2c6c45dffdb04b7b735154b6a0d4a50))
+* perf: Calculate exceed line faster ([`f82a004`](../../commit/f82a004137ac4a6a9f0c0249ee506d0006427b1e))
 
 ## 0.1.1
 > Released Dec 29, 2022
 
-* Use window start/end instead of mode-line format to calculate buffer percentage (30286ef015183d1229de605a7b30062813ed0794)
-* Fix when truncate lines are disabled (dd966bb9b0b858d028c0af7399f6edba1d22c450)
-* Don't enable inside terminal (8bda044ad7b741abc239b9df177e65ad0f969ea9)
-* Fix show horizontal scroll bar's logic (afda338ccd67456142361be610a6bdd7e2360143)
-* Function show/hide in editing (#1)
+* Use window start/end instead of mode-line format to calculate buffer percentage ([`30286ef`](../../commit/30286ef015183d1229de605a7b30062813ed0794))
+* Fix when truncate lines are disabled ([`dd966bb`](../../commit/dd966bb9b0b858d028c0af7399f6edba1d22c450))
+* Don't enable inside terminal ([`8bda044`](../../commit/8bda044ad7b741abc239b9df177e65ad0f969ea9))
+* Fix show horizontal scroll bar's logic ([`afda338`](../../commit/afda338ccd67456142361be610a6bdd7e2360143))
+* Function show/hide in editing ([#1](../../pull/1))
 
 ## 0.1.0
 > Released Mar 02, 2022
