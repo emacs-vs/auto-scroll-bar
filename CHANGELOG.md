@@ -11,6 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 * Use `post-command` instead of `after-change` for performance ([`9cdec11`](../../commit/9cdec11a23601af7dc9ebbaf8b8140245f91ec6f))
 * Display horizontal scroll bar when window no align to the left ([`3ddec68`](../../commit/3ddec689d2c6c45dffdb04b7b735154b6a0d4a50))
 * perf: Calculate exceed line faster ([`f82a004`](../../commit/f82a004137ac4a6a9f0c0249ee506d0006427b1e))
+* pref: Ignore `jit-lock-functions` ([`026f4cf`](../../commit/026f4cfbb659088df1ade912f13e5e611101cc6b))
 
 ## 0.1.1
 > Released Dec 29, 2022
