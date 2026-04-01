@@ -5,8 +5,13 @@ All notable changes to this project will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 
-## 0.1.2 (Unreleased)
+## 0.2.1 (Unreleased)
 > Released N/A
+
+* N/A
+
+## 0.2.0
+> Released Apr 01, 2026
 
 * Use `post-command` instead of `after-change` for performance ([`9cdec11`](../../commit/9cdec11a23601af7dc9ebbaf8b8140245f91ec6f))
 * Display horizontal scroll bar when window no align to the left ([`3ddec68`](../../commit/3ddec689d2c6c45dffdb04b7b735154b6a0d4a50))
