@@ -5,7 +5,7 @@
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; URL: https://github.com/emacs-vs/auto-scroll-bar
-;; Version: 0.2.0
+;; Version: 0.2.1
 ;; Package-Requires: ((emacs "29.1") (elenv "0.1.0"))
 ;; Keywords: convenience scrollbar
 

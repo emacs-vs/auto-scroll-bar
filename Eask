@@ -1,7 +1,7 @@
 ;; -*- mode: eask; lexical-binding: t -*-
 
 (package "auto-scroll-bar"
-         "0.2.0"
+         "0.2.1"
          "Automatically show/hide scroll-bars as needed")
 
 (website-url "https://github.com/emacs-vs/auto-scroll-bar")
