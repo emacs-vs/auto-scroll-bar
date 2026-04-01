@@ -45,13 +45,13 @@
 (defcustom auto-scroll-bar-disabled-buffers
   nil
   "List of buffers to disable the scroll bar completely."
-  :type 'list
+  :type '(list string)
   :group 'auto-scroll-bar)
 
 (defcustom auto-scroll-bar-disabled-major-modes
   nil
   "List of major-mode to disable the scroll bar completely."
-  :type 'list
+  :type '(list string)
   :group 'auto-scroll-bar)
 
 (defcustom auto-scroll-bar-hide-minibuffer t
@@ -163,7 +163,8 @@ and SHOW-H."
            (with-selected-window win
              (if (auto-scroll-bar--disabled-p)
                  (auto-scroll-bar--update win nil nil)
-               (let* ((wend   (window-end nil t))
+               (let* ((jit-lock-functions)
+                      (wend   (window-end nil t))
                       (wstart (window-start))
                       (show-v (auto-scroll-bar--show-v-p wstart wend))
                       (show-h (auto-scroll-bar--show-h-p wstart wend)))
