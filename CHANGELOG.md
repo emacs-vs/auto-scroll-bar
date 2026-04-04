@@ -8,7 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## 0.2.1 (Unreleased)
 > Released N/A
 
-* N/A
+* perf: Use timer to prevent overhead in post command ([`96debec`](../../commit/96debece42d901d9d3fa799bdebe1e7960dc6886))
 
 ## 0.2.0
 > Released Apr 01, 2026
