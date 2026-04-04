@@ -64,6 +64,9 @@
   :type 'boolean
   :group 'auto-scroll-bar)
 
+(defvar auto-scroll-bar--timer nil
+  "The post command timer.")
+
 ;;
 ;; (@* "Util" )
 ;;
@@ -202,7 +205,15 @@ Optional argument FRAME is used to select frame's minibuffer."
 (defun auto-scroll-bar--post-command (&rest _)
   "Hook for post command."
   (elenv-with-no-redisplay
-    (auto-scroll-bar--show-hide (selected-window))))
+    ;; Clean up timer.
+    (when auto-scroll-bar--timer
+      (cancel-timer auto-scroll-bar--timer)
+      (setq auto-scroll-bar--timer nil))
+    ;; Start refresh.
+    (setq auto-scroll-bar--timer
+          (run-with-timer 0.0 nil
+                          (lambda (&rest _)
+                            (auto-scroll-bar--show-hide (selected-window)))))))
 
 (defun auto-scroll-bar--enable ()
   "Enable function `auto-scroll-bar-mode'."
